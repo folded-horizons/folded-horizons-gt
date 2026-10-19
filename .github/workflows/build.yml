@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: 'Check out the core mod (this module depends on it)'
+        uses: actions/checkout@v5
+        with:
+          repository: folded-horizons/folded-horizons-core
+          path: .core
+
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Gradle (caching)
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: 'Publish core to mavenLocal'
+        working-directory: .core
+        run: |
+          gradle wrapper --gradle-version 8.8 --no-daemon
+          ./gradlew :core:publishToMavenLocal --no-daemon
+
+      - name: Build this module
+        run: |
+          gradle wrapper --gradle-version 8.8 --no-daemon
+          ./gradlew build --no-daemon
