@@ -12,15 +12,26 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+repositories {
+    // The core mod is a sibling repo. During development publish it with
+    //   (core repo) gradle :core:publishToMavenLocal
+    // Released versions also resolve from GitHub Packages (see CI).
+    mavenLocal()
+    maven {
+        name = 'NeoForged'
+        url = 'https://maven.neoforged.net/releases'
+    }
+}
+
 dependencies {
-    api 'dev.foldedhorizons:foldedhorizons:${mod_version}'
+    api "dev.foldedhorizons:foldedhorizons:${mod_version}"
 }
 
 neoForge {
     version = project.neo_version
 
     mods {
-        "foldedhorizons-$m" {
+        "foldedhorizons-gt" {
             sourceSet sourceSets.main
         }
     }
